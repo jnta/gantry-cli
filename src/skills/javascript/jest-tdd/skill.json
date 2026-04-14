@@ -1,1 +1,8 @@
-{ "label": "Jest TDD" }
+{
+  "id": "jest-tdd",
+  "label": "Jest TDD",
+  "category": "javascript",
+  "description": "Forces the agent to write tests before implementing functions.",
+  "sensors": ["npm test"],
+  "rulesPath": "instructions.md"
+}

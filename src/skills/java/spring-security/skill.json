@@ -1,1 +1,8 @@
-{ "label": "Spring Security Harness" }
+{
+  "id": "spring-security-harness",
+  "label": "Spring Security Guard",
+  "category": "java",
+  "description": "Enforces security patterns and prevents common authentication slop.",
+  "sensors": ["mvn test -Dtest=SecuritySuite"],
+  "rulesPath": "instructions.md"
+}

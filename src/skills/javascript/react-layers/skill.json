@@ -1,1 +1,8 @@
-{ "label": "React Layers" }
+{
+  "id": "react-layers",
+  "label": "React Layers",
+  "category": "javascript",
+  "description": "Enforces proper separation of React UI components and custom hooks.",
+  "sensors": ["npm run lint"],
+  "rulesPath": "instructions.md"
+}

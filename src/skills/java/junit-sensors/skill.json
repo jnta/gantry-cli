@@ -1,1 +1,8 @@
-{ "label": "JUnit Sensors" }
+{
+  "id": "junit-sensors",
+  "label": "JUnit Sensors",
+  "category": "java",
+  "description": "Ensures complete coverage using JUnit 5 parameterized tests.",
+  "sensors": ["mvn test"],
+  "rulesPath": "instructions.md"
+}

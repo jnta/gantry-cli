@@ -1,4 +1,4 @@
-import { checkbox, select, Separator } from '@inquirer/prompts';
+import { checkbox, search, Separator } from '@inquirer/prompts';
 import fs from 'fs-extra';
 import chalk from 'chalk';
 import path from 'path';
@@ -41,39 +41,52 @@ async function getSkillsCatalog(dir) {
   return catalog;
 }
 
-async function selectSkillsCollapsible(catalog) {
+async function gantrySkillPicker(catalog) {
   let selectedSkills = [];
   let isDone = false;
 
   while (!isDone) {
-    const action = await select({
-      message: `Selected: ${selectedSkills.length} skills. Manage your harness:`,
-      choices: [
-        ...catalog.map(cat => ({
-          name: `${cat.expanded ? '📂' : '📁'} ${cat.category.toUpperCase()}`,
-          value: cat.category
-        })),
-        { name: chalk.green('✔ DONE - Generate Harness'), value: 'done' }
-      ]
+    // Top-level "Modern" Menu
+    const action = await search({
+      message: `[${selectedSkills.length} skills active] Manage Harness Skills:`,
+      source: async (input) => {
+        const categories = catalog.map(cat => ({
+          name: `📁 ${cat.category.toUpperCase()}`,
+          value: { type: 'category', id: cat.category },
+          description: `Contains ${cat.skills.length} skills`
+        }));
+
+        const meta = [
+          { name: chalk.green.bold('✔ FINALIZE HARNESS'), value: { type: 'done' } },
+          { name: chalk.yellow('🔍 Global Search'), value: { type: 'search' } }
+        ];
+
+        const all = [...categories, ...meta];
+        if (!input) return all;
+        
+        // Dynamic filtering for the "modern" feel
+        return all.filter(c => c.name.toLowerCase().includes(input.toLowerCase()));
+      }
     });
 
-    if (action === 'done') {
+    if (action.type === 'done') {
       isDone = true;
-    } else {
-      const category = catalog.find(c => c.category === action);
+    } else if (action.type === 'category') {
+      const categoryData = catalog.find(c => c.category === action.id);
       
-      const skillsInCat = await checkbox({
-        message: `Select skills in ${action}:`,
-        choices: category.skills.map(s => ({
+      const picked = await checkbox({
+        message: `Toggle skills for ${action.id.toUpperCase()}:`,
+        choices: categoryData.skills.map(s => ({
           name: s.label,
           value: s,
-          checked: selectedSkills.some(existing => existing.id === s.id)
+          checked: selectedSkills.some(item => item.id === s.id)
         }))
       });
 
+      // Update selection: Remove old items from this category and add the new selection
       selectedSkills = [
-        ...selectedSkills.filter(s => s.category !== action),
-        ...skillsInCat
+        ...selectedSkills.filter(s => s.category !== action.id),
+        ...picked
       ];
     }
   }
@@ -95,7 +108,7 @@ export async function initAction() {
   const skillsDir = path.join(__dirname, '../skills');
   const catalog = await getSkillsCatalog(skillsDir);
 
-  const selectedSkills = await selectSkillsCollapsible(catalog);
+  const selectedSkills = await gantrySkillPicker(catalog);
 
   for (const tool of tools) {
     if (tool === 'cursor') {
