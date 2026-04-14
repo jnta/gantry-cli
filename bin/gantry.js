@@ -1,3 +1,15 @@
 #!/usr/bin/env node
+import { program } from 'commander';
+import { initAction } from '../src/commands/init.js';
 
-console.log("Gantry CLI initialized");
+program
+  .name('gantry')
+  .description('Harness Engineering CLI for AI Agents')
+  .version('1.0.0');
+
+program
+  .command('init')
+  .description('Initialize the AI harness in the current repository')
+  .action(initAction);
+
+program.parse();

@@ -51,3 +51,6 @@ dist/
 .vscode/
 *.swp
 *.swo
+
+# Gantry
+.gantry/
